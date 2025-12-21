@@ -1,0 +1,31 @@
+# My-Brain AI - Docker Compose 개발 환경 오버라이드
+# 사용법: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    volumes:
+      - ./apps/server:/app/apps/server  # 핫 리로드용 소스 마운트
+      - ./data:/app/data
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - LOG_FORMAT=text
+    # 개발 모드: uvicorn 직접 실행 (핫 리로드)
+    command: ["uvicorn", "apps.server.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      target: builder  # 개발용 빌더 스테이지 사용
+    volumes:
+      - ./apps/web:/app  # 핫 리로드용 소스 마운트
+      - /app/node_modules  # node_modules 볼륨 유지
+      - /app/.next  # .next 볼륨 유지
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]

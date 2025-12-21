@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+.eggs
+dist
+build
+
+# Node.js
+node_modules
+.next
+.npm
+
+# 환경 설정
+.env
+.env.local
+.env.*.local
+
+# 데이터 (볼륨으로 마운트)
+data/company/*
+data/personal/*
+data/project/*
+data/.vector_db
+
+# 개발 도구
+.idea
+.vscode
+*.swp
+*.swo
+
+# 문서
+docs/
+*.md
+!README.md
+
+# 테스트
+tests/
+__tests__/
+*.test.js
+*.spec.js
+
+# 로그
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

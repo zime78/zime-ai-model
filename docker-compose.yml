@@ -1,0 +1,53 @@
+# My-Brain AI - Docker Compose 설정
+# 프로덕션 환경용
+
+services:
+  # FastAPI 백엔드
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: my-brain-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./gunicorn.conf.py:/app/gunicorn.conf.py:ro
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - CHROMA_DB_PATH=/app/data/.vector_db
+      - BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - my-brain-network
+
+  # Next.js 프론트엔드
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: my-brain-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - my-brain-network
+
+networks:
+  my-brain-network:
+    driver: bridge
