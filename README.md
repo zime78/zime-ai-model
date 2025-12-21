@@ -159,13 +159,30 @@ cp -r ~/Projects/my-project/docs/* data/project/
 
 ## ▶️ 실행 방법
 
-### 방법 1: 통합 실행 스크립트 (권장)
-
-**터미널 1 - 백엔드 서버:**
+### 방법 1: Docker 실행 (권장)
 
 ```bash
-# 프로젝트 루트 디렉토리에서
-./run_server.sh
+# 환경변수 설정
+cp .env.example .env
+
+# Docker로 서버 시작 (백그라운드)
+./scripts/start-server.sh docker
+
+# 로그 확인
+docker-compose logs -f
+```
+
+### 방법 2: 통합 스크립트 실행
+
+```bash
+# 환경변수 설정
+cp .env.example .env
+
+# 개발 모드 (핫 리로드)
+./scripts/start-server.sh dev
+
+# 프로덕션 모드 (Gunicorn)
+./scripts/start-server.sh prod
 ```
 
 **터미널 2 - 프론트엔드:**
@@ -175,7 +192,7 @@ cd apps/web
 npm run dev
 ```
 
-### 방법 2: 수동 실행
+### 방법 3: 수동 실행
 
 **터미널 1 - 백엔드:**
 
@@ -200,6 +217,8 @@ npm run dev
 - **로컬 접속**: http://localhost:3000
 - **외부 기기 접속**: http://[서버-IP]:3000
   - 예: http://192.168.0.38:3000
+- **API 문서**: http://localhost:8000/docs (개발 모드)
+- **헬스체크**: http://localhost:8000/health
 
 > 💡 같은 WiFi에 연결된 iPad나 스마트폰에서도 접속할 수 있습니다!
 
@@ -272,20 +291,30 @@ lsof -i :3000
 ```
 zime-ai-model/
 ├── apps/
-│   ├── server/          # FastAPI 백엔드
-│   │   ├── api/         # API 라우터
-│   │   ├── core/        # 설정 및 핵심 로직
-│   │   ├── services/    # 비즈니스 로직
-│   │   └── main.py      # 서버 진입점
-│   └── web/             # Next.js 프론트엔드
-│       └── src/         # React 컴포넌트
-├── data/                # 학습 데이터 (gitignore)
+│   ├── server/              # FastAPI 백엔드
+│   │   ├── api/             # API 라우터
+│   │   │   └── health.py    # 헬스체크 API
+│   │   ├── core/            # 설정 및 핵심 로직
+│   │   │   ├── config.py    # 환경변수 설정
+│   │   │   ├── logging.py   # 구조화 로깅
+│   │   │   └── middleware.py # 미들웨어
+│   │   ├── services/        # 비즈니스 로직
+│   │   └── main.py          # 서버 진입점
+│   └── web/                 # Next.js 프론트엔드
+│       └── src/             # React 컴포넌트
+├── data/                    # 학습 데이터 (gitignore)
 │   ├── company/
 │   ├── personal/
 │   └── project/
-├── docs/                # 프로젝트 문서
-├── requirements.txt     # Python 의존성
-└── run_server.sh        # 서버 실행 스크립트
+├── scripts/
+│   └── start-server.sh      # 서버 시작 스크립트
+├── docs/                    # 프로젝트 문서
+├── .env.example             # 환경변수 템플릿
+├── docker-compose.yml       # Docker 설정
+├── Dockerfile.server        # 백엔드 Docker 이미지
+├── Dockerfile.web           # 프론트엔드 Docker 이미지
+├── gunicorn.conf.py         # Gunicorn 설정
+└── requirements.txt         # Python 의존성
 ```
 
 ---
@@ -295,9 +324,10 @@ zime-ai-model/
 | 분류 | 기술 |
 |------|------|
 | **LLM** | Ollama (Qwen2.5-VL, Llama3.1) |
-| **백엔드** | FastAPI, Uvicorn, Python 3.11+ |
+| **백엔드** | FastAPI, Gunicorn, Python 3.11+ |
 | **프론트엔드** | Next.js 16, React 19, TypeScript |
 | **RAG** | LangChain, ChromaDB |
+| **배포** | Docker, Docker Compose |
 | **파일 감시** | Watchdog |
 
 ---
