@@ -35,5 +35,5 @@ data/project/*
 data/.vector_db/
 
 # Editor
-.vscode/
+# .vscode/
 .idea/

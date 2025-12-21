@@ -1,3 +1,6 @@
+import warnings
+from langchain_core._api import LangChainDeprecationWarning
+warnings.filterwarnings("ignore", category=LangChainDeprecationWarning)
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 from apps.server.core.config import settings
@@ -11,6 +14,15 @@ class LLMService:
             base_url=settings.OLLAMA_BASE_URL,
             model=self.model_name  # 로컬 가용 모델 사용
         )
+
+    def check_connection(self) -> bool:
+        """Ollama 서버 연결 확인"""
+        try:
+            # 간단한 메타데이터 요청으로 연결 확인
+            self.llm.invoke([HumanMessage(content="test")])
+            return True
+        except Exception:
+            return False
 
     def generate_response(self, prompt: str, system_prompt: str = None) -> str:
         messages = []

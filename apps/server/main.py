@@ -20,6 +20,32 @@ async def lifespan(app: FastAPI):
     """애플리케이션 생명주기 관리"""
     # Startup
     setup_logging()
+    
+    # Ollama 연결 확인
+    from apps.server.services.llm import llm_service
+    import logging
+    logger = logging.getLogger(__name__)
+
+    try:
+        logger.info("Checking Ollama connection...")
+        # Note: 간단한 체크를 수행. 실패해도 서버는 켜되 경고를 남김
+        is_connected = llm_service.check_connection()
+        if not is_connected:
+            msg = """
+            ================================================================
+            [WARNING] Ollama Server Connection Failed!
+            
+            1. Ollama is not running. Please run 'ollama serve' in terminal.
+            2. Or check OLLAMA_BASE_URL setting.
+            ================================================================
+            """
+            print(msg)  # Console output
+            logger.warning(msg)
+        else:
+            logger.info("Ollama connection confirmed.")
+    except Exception as e:
+        logger.warning(f"Ollama check failed: {e}")
+
     ingestion_service.start_watching()
     yield
     # Shutdown

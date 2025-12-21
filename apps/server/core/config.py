@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
 
     # CORS (쉼표로 구분된 문자열 또는 리스트)
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    BACKEND_CORS_ORIGINS: List[str] | str = ["http://localhost:3000"]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod

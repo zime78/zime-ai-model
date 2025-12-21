@@ -212,7 +212,21 @@ cd apps/web
 npm run dev
 ```
 
-### 접속하기
+### 방법 4: macOS App Bundle 빌드 (배포용)
+
+로컬에서 독립 실행형 `.app` 번들을 빌드할 수 있습니다.
+
+```bash
+# 빌드 스크립트 실행 (Clean Build & PkgInfo 자동 생성)
+./scripts/build_mac.sh
+```
+
+**실행:**
+```bash
+open dist/MyBrainAI.app
+```
+(또는 `dist` 폴더에서 `MyBrainAI.app` 더블 클릭)
+
 
 - **로컬 접속**: http://localhost:3000
 - **외부 기기 접속**: http://[서버-IP]:3000

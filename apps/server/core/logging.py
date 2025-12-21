@@ -79,6 +79,18 @@ def setup_logging(
 
     root_logger.addHandler(handler)
 
+    # 에러 로그 파일 설정 (error.txt)
+    try:
+        file_handler = logging.FileHandler("error.txt", encoding="utf-8")
+        file_handler.setLevel(logging.ERROR)
+        if fmt == "json":
+            file_handler.setFormatter(JSONFormatter())
+        else:
+            file_handler.setFormatter(TextFormatter())
+        root_logger.addHandler(file_handler)
+    except Exception:
+        pass  # 파일 권한 등으로 실패시 무시
+
     # 외부 라이브러리 로그 레벨 조정
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("httpx").setLevel(logging.WARNING)
