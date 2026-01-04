@@ -62,15 +62,31 @@ npm run lint
 apps/
 ├── server/              # FastAPI 백엔드
 │   ├── main.py          # 앱 진입점, lifespan에서 파일 감시 시작/종료
-│   ├── api/             # API 라우터 (chat, rag, work, health)
+│   ├── bundle_main.py   # macOS App Bundle 진입점
+│   ├── api/             # API 라우터
+│   │   ├── routes.py    # 라우터 통합
+│   │   ├── chat.py      # 채팅 API
+│   │   ├── rag.py       # RAG 검색 API
+│   │   ├── work.py      # 업무 로그/평가 API
+│   │   ├── health.py    # 헬스체크 API
+│   │   └── system.py    # 시스템 관리 API
 │   ├── core/            # 설정 및 핵심 로직
 │   │   ├── config.py    # 환경변수 설정 (pydantic-settings)
 │   │   ├── logging.py   # 구조화 로깅 (JSON/텍스트)
-│   │   └── middleware.py # 요청 타이밍 미들웨어
+│   │   ├── middleware.py # 요청 타이밍 미들웨어
+│   │   └── error_handler.py # 에러 핸들링
 │   └── services/        # 비즈니스 로직
-│       ├── llm.py       # Ollama 연동
-│       ├── rag.py       # 벡터 검색 엔진
-│       └── ingest.py    # 파일 감시 및 처리 (Watchdog)
+│       ├── llm/         # LLM 서비스 (핸들러 패턴)
+│       │   ├── service.py    # LLMService 클래스
+│       │   └── handlers/     # 요청 핸들러
+│       │       ├── base.py   # BaseHandler (ABC)
+│       │       ├── rag.py    # RAG 폴백 핸들러
+│       │       ├── help.py   # 도움말 핸들러
+│       │       ├── folder_tree.py # 폴더 구조 핸들러
+│       │       └── file_list.py   # 파일 목록 핸들러
+│       ├── rag.py       # SimpleRAGEngine (인메모리 검색)
+│       ├── ingest.py    # 파일 감시 및 처리 (Watchdog)
+│       └── evaluation.py # 성과 평가 서비스
 └── web/                 # Next.js 프론트엔드
     └── src/
         ├── app/         # 페이지 (/, /chat, /history, /settings)
@@ -104,9 +120,11 @@ apps/
 - `LOG_FORMAT`: json | text
 
 ### API 엔드포인트
-- `/api/v1/chat` - 채팅 API
-- `/api/v1/rag` - RAG 검색 API
-- `/api/v1/work` - 작업 관리 API
+- `/api/v1/chat` - AI 채팅 API
+- `/api/v1/search` - RAG 문서 검색 API
+- `/api/v1/work/logs` - 업무 로그 생성/조회 API
+- `/api/v1/work/evaluation/summary` - 성과 평가 API
+- `/api/v1/system/reload` - 데이터 리로드 API
 - `/health` - 상세 헬스체크
 - `/health/live` - Liveness 프로브
 - `/health/ready` - Readiness 프로브
@@ -114,7 +132,8 @@ apps/
 
 ## 기술 스택
 
-- **백엔드**: Python 3.11+, FastAPI, Gunicorn, LangChain, ChromaDB, Watchdog
+- **백엔드**: Python 3.11+, FastAPI, Gunicorn, LangChain, Watchdog
+- **RAG**: SimpleRAGEngine (인메모리), ChromaDB (선택적)
 - **프론트엔드**: Next.js 16, React 19, TypeScript
-- **AI**: Ollama (로컬 LLM)
+- **AI**: Ollama (qwen2.5vl:7b - Vision 지원)
 - **배포**: Docker, Docker Compose

@@ -67,13 +67,13 @@ ollama serve
 
 ```bash
 # Vision 지원 모델 (이미지 분석용) - 권장
-ollama pull qwen2.5-vl:7b
+ollama pull qwen2.5vl:7b
 
 # 일반 대화용 모델 (선택)
 ollama pull llama3.1:8b
 ```
 
-> 💡 **팁**: 모델 다운로드는 시간이 걸릴 수 있습니다. `qwen2.5-vl:7b` 모델은 약 4.7GB입니다.
+> 💡 **팁**: 모델 다운로드는 시간이 걸릴 수 있습니다. `qwen2.5vl:7b` 모델은 약 4.7GB입니다.
 
 ---
 
@@ -306,14 +306,25 @@ lsof -i :3000
 zime-ai-model/
 ├── apps/
 │   ├── server/              # FastAPI 백엔드
+│   │   ├── main.py          # 서버 진입점
+│   │   ├── bundle_main.py   # macOS App Bundle 진입점
 │   │   ├── api/             # API 라우터
-│   │   │   └── health.py    # 헬스체크 API
+│   │   │   ├── routes.py    # 라우터 통합
+│   │   │   ├── chat.py      # 채팅 API
+│   │   │   ├── rag.py       # RAG 검색 API
+│   │   │   ├── work.py      # 업무 로그/평가 API
+│   │   │   ├── health.py    # 헬스체크 API
+│   │   │   └── system.py    # 시스템 관리 API
 │   │   ├── core/            # 설정 및 핵심 로직
 │   │   │   ├── config.py    # 환경변수 설정
 │   │   │   ├── logging.py   # 구조화 로깅
-│   │   │   └── middleware.py # 미들웨어
-│   │   ├── services/        # 비즈니스 로직
-│   │   └── main.py          # 서버 진입점
+│   │   │   ├── middleware.py # 미들웨어
+│   │   │   └── error_handler.py # 에러 핸들링
+│   │   └── services/        # 비즈니스 로직
+│   │       ├── llm/         # LLM 서비스 (핸들러 패턴)
+│   │       ├── rag.py       # SimpleRAGEngine
+│   │       ├── ingest.py    # 파일 감시/처리
+│   │       └── evaluation.py # 성과 평가
 │   └── web/                 # Next.js 프론트엔드
 │       └── src/             # React 컴포넌트
 ├── data/                    # 학습 데이터 (gitignore)
@@ -337,10 +348,10 @@ zime-ai-model/
 
 | 분류 | 기술 |
 |------|------|
-| **LLM** | Ollama (Qwen2.5-VL, Llama3.1) |
+| **LLM** | Ollama (qwen2.5vl:7b - Vision 지원) |
 | **백엔드** | FastAPI, Gunicorn, Python 3.11+ |
 | **프론트엔드** | Next.js 16, React 19, TypeScript |
-| **RAG** | LangChain, ChromaDB |
+| **RAG** | SimpleRAGEngine (인메모리), ChromaDB (선택적) |
 | **배포** | Docker, Docker Compose |
 | **파일 감시** | Watchdog |
 

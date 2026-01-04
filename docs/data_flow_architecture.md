@@ -69,6 +69,40 @@ graph TD
 4. **데이터 접근**: 이제 앱은 `./data` 경로를 통해 `dist/data` 폴더에 접근할 수 있습니다.
 5. **학습(Index)**: `ingest.py`가 `./data` 폴더를 스캔하여 모든 문서를 메모리에 로드합니다.
 
+## 3. LLM 핸들러 아키텍처 (Handler Pattern)
+
+LLM 서비스는 핸들러 체인을 통해 사용자 요청을 처리합니다:
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant L as LLMService
+    participant H as HelpHandler
+    participant T as TreeHandler
+    participant F as FileListHandler
+    participant R as RAGHandler
+
+    U->>L: prompt
+    L->>H: can_handle(prompt)?
+    alt 도움말 키워드
+        H-->>L: handle() -> context
+    else
+        H-->>L: false
+        L->>T: can_handle(prompt)?
+        alt 트리 키워드
+            T-->>L: handle() -> context
+        else
+            L->>F: can_handle(prompt)?
+            alt 목록 키워드
+                F-->>L: handle() -> context
+            else
+                L->>R: handle() -> RAG search
+            end
+        end
+    end
+    L->>U: LLM response with context
+```
+
 ## 요약
 
 | 구분 | 위치 | 설명 |
@@ -76,5 +110,7 @@ graph TD
 | **실행 파일** | `dist/MyBrainAI.app` | 변경 불가능한 프로그램 본체 |
 | **데이터 폴더** | `dist/data` | 사용자가 파일을 추가/수정하는 곳 |
 | **로그 파일** | `dist/error.txt` | 실행 로그가 저장되는 곳 |
+| **RAG 엔진** | 인메모리 | SimpleRAGEngine (키워드 기반) |
+| **LLM 모델** | Ollama | qwen2.5vl:7b (Vision 지원) |
 
 이 구조 덕분에 **앱을 재빌드해도 `data` 폴더를 백업했다가 다시 넣어줄 필요 없이**, 프로젝트 루트의 `data` 폴더만 관리하면 자동으로 배포본(`dist`)에 반영됩니다.

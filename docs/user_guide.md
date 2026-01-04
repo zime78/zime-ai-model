@@ -50,9 +50,21 @@
 >
 > **데이터 새로고침 (Reload):**
 > 앱을 재시작하지 않고 데이터를 갱신하려면 다음 API를 호출하세요:
-> `curl -X POST http://localhost:8000/system/reload`
+> `curl -X POST http://localhost:8000/api/v1/system/reload`
 
-## 4. 환경 설정 (고급)
+## 4. 채팅 명령어
+
+My-Brain 채팅에서 사용할 수 있는 특수 명령어:
+
+| 명령어 예시 | 기능 |
+|------------|------|
+| "도움말", "사용법" | 사용 가이드 표시 |
+| "폴더 구조 보여줘" | 학습된 파일의 트리 구조 |
+| "폴더 구조 이미지로" | 트리 구조 이미지 생성 |
+| "파일 목록", "리스트" | 인덱싱된 파일 목록 |
+| 일반 질문 | RAG 검색 후 답변 생성 |
+
+## 5. 환경 설정 (고급)
 
 기본 설정으로 동작하지만, 설정을 변경하고 싶다면 실행 파일 옆에 `.env` 파일을 생성하여 오버라이드할 수 있습니다.
 
@@ -65,7 +77,18 @@ OLLAMA_BASE_URL=http://localhost:11434
 API_PORT=8000
 ```
 
-## 5. 트러블슈팅 (문제 해결)
+### API 직접 호출 (개발자용)
+
+| 기능 | 메서드 | URL |
+|------|--------|-----|
+| AI 채팅 | POST | /api/v1/chat |
+| 문서 검색 | POST | /api/v1/search |
+| 업무 로그 생성 | POST | /api/v1/work/logs |
+| 업무 로그 조회 | GET | /api/v1/work/logs |
+| 성과 평가 | GET | /api/v1/work/evaluation/summary |
+| 데이터 리로드 | POST | /api/v1/system/reload |
+
+## 6. 트러블슈팅 (문제 해결)
 
 > [!IMPORTANT]
 > **오류 로그 확인 (`error.txt`)**:
